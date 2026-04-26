@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redirecting… | SAINT F.CLOUD</title>
+  <meta name="robots" content="noindex" />
+  <script>
+    (function () {
+      var path = window.location.pathname || '/';
+      var legacyPrefix = '/saintfcloud';
+      if (path === legacyPrefix || path.indexOf(legacyPrefix + '/') === 0) {
+        var nextPath = path.replace(legacyPrefix, '') || '/';
+        window.location.replace(nextPath + window.location.search + window.location.hash);
+        return;
+      }
+      window.location.replace('/');
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting to the official homepage…</p>
+</body>
+</html>
