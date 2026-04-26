@@ -57,6 +57,25 @@
     }
   });
 
+  const navToggle = document.querySelector('[data-menu-toggle]');
+  const navMenu = document.querySelector('[data-menu]');
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+      navToggle.setAttribute('aria-expanded', String(!expanded));
+      navMenu.hidden = expanded;
+      document.body.classList.toggle('menu-open', !expanded);
+    });
+
+    navMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navToggle.setAttribute('aria-expanded', 'false');
+        navMenu.hidden = true;
+        document.body.classList.remove('menu-open');
+      });
+    });
+  }
+
   const form = document.querySelector('[data-newsletter]');
   if (form) {
     const emailField = form.querySelector('input[type="email"]');
@@ -64,7 +83,7 @@
 
     const stored = localStorage.getItem(SITE.storageKey);
     if (stored && status) {
-      status.textContent = `You're subscribed with ${stored}.`;
+      status.textContent = `YOU'RE SUBSCRIBED WITH ${stored}.`;
       status.className = 'form-status success';
     }
 
@@ -74,7 +93,7 @@
       const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
       if (!ok) {
-        status.textContent = 'Please enter a valid email address.';
+        status.textContent = 'PLEASE ENTER A VALID EMAIL ADDRESS.';
         status.className = 'form-status error';
         return;
       }
