@@ -2,6 +2,7 @@
   const SITE = {
     legacyProjectPrefix: '/saintfcloud',
     storageKey: 'saintfcloud_newsletter_email',
+    modalSeenKey: 'saintfcloud_welcome_seen',
   };
 
   const normalizePath = (path) => {
@@ -59,20 +60,64 @@
 
   const navToggle = document.querySelector('[data-menu-toggle]');
   const navMenu = document.querySelector('[data-menu]');
+  const closeMenu = () => {
+    if (!navToggle || !navMenu) return;
+    navToggle.setAttribute('aria-expanded', 'false');
+    navMenu.hidden = true;
+    document.body.classList.remove('menu-open');
+  };
+
   if (navToggle && navMenu) {
     navToggle.addEventListener('click', () => {
-      const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-      navToggle.setAttribute('aria-expanded', String(!expanded));
-      navMenu.hidden = expanded;
-      document.body.classList.toggle('menu-open', !expanded);
+      const willOpen = navToggle.getAttribute('aria-expanded') !== 'true';
+      navToggle.setAttribute('aria-expanded', String(willOpen));
+      navMenu.hidden = !willOpen;
+      document.body.classList.toggle('menu-open', willOpen);
+    });
+
+    document.addEventListener('click', (event) => {
+      if (navMenu.hidden) return;
+      if (!navMenu.contains(event.target) && !navToggle.contains(event.target)) closeMenu();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeMenu();
     });
 
     navMenu.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => {
-        navToggle.setAttribute('aria-expanded', 'false');
-        navMenu.hidden = true;
-        document.body.classList.remove('menu-open');
-      });
+      link.addEventListener('click', closeMenu);
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 860) closeMenu();
+    });
+  }
+
+  const modal = document.querySelector('[data-welcome-modal]');
+  const closeModal = () => {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+    localStorage.setItem(SITE.modalSeenKey, '1');
+  };
+
+  if (modal) {
+    const seen = localStorage.getItem(SITE.modalSeenKey) === '1';
+    if (!seen) {
+      modal.hidden = false;
+      document.body.classList.add('modal-open');
+    }
+
+    modal.querySelectorAll('[data-close-modal]').forEach((btn) => {
+      btn.addEventListener('click', closeModal);
+    });
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.hidden) closeModal();
     });
   }
 
@@ -99,14 +144,12 @@
       }
 
       localStorage.setItem(SITE.storageKey, email);
-      status.textContent = `Subscribed. We'll send updates to ${email}.`;
+      status.textContent = `SUBSCRIBED. UPDATES WILL GO TO ${email}.`;
       status.className = 'form-status success';
       form.reset();
     });
   }
 
   const year = document.getElementById('year');
-  if (year) {
-    year.textContent = String(new Date().getFullYear());
-  }
+  if (year) year.textContent = String(new Date().getFullYear());
 })();
